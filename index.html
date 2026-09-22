@@ -75,21 +75,31 @@ a:hover { color: #6a6aa3; }
   footer { padding-bottom:170px !important; }
 }
 
-.reveal { opacity:0; transform:translateY(26px); transition:opacity .7s cubic-bezier(.22,.61,.36,1), transform .7s cubic-bezier(.22,.61,.36,1); will-change:opacity,transform; }
-.reveal.is-visible { opacity:1; transform:none; }
-.reveal-grid > .reveal:nth-child(2){transition-delay:.07s}
-.reveal-grid > .reveal:nth-child(3){transition-delay:.14s}
-.reveal-grid > .reveal:nth-child(4){transition-delay:.21s}
-.reveal-grid > .reveal:nth-child(5){transition-delay:.28s}
-.reveal-grid > .reveal:nth-child(6){transition-delay:.35s}
-.reveal-grid > .reveal:nth-child(7){transition-delay:.42s}
-.reveal-grid > .reveal:nth-child(8){transition-delay:.49s}
+/* Scroll-reveal is pure CSS (scroll-driven animation), on purpose: this
+   page re-renders every second (countdown timer), and any JS-added class
+   (e.g. an IntersectionObserver toggling .is-visible) gets wiped by that
+   re-render the moment it fires, permanently stranding revealed blocks at
+   opacity:0. animation-timeline reads scroll position directly with no
+   DOM/JS state to lose, so it survives re-renders. Unsupported browsers
+   fall through the @supports guard and just see the content, fully visible
+   — never hidden. */
+.reveal { opacity:1; }
+@supports (animation-timeline: view()) {
+  .reveal {
+    opacity:0;
+    transform:translateY(26px);
+    animation: reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 45%;
+  }
+  @keyframes reveal-in { to { opacity:1; transform:none; } }
+}
 
 image-slot{transition:transform .5s cubic-bezier(.22,.61,.36,1)}
 figure:hover image-slot, .authors-grid image-slot:hover { transform:scale(1.04); }
 
 @media (prefers-reduced-motion: reduce){
-  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+  .reveal{ opacity:1 !important; transform:none !important; animation:none !important; }
   image-slot{ transition:none !important; }
 }
 </style>
@@ -522,36 +532,6 @@ class Component extends DCLogic {
     };
   }
 }
-</script>
-<script>
-(function(){
-  function setup(){
-    var els = document.querySelectorAll('.reveal');
-    if (!els.length) return;
-    if (!('IntersectionObserver' in window)) {
-      els.forEach(function(e){ e.classList.add('is-visible'); });
-      return;
-    }
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-    els.forEach(function(e){ io.observe(e); });
-  }
-  // Run after the dc-runtime has mounted the page content. A short poll is
-  // more reliable than a single window-load check, since CDN scripts and
-  // React can finish mounting slightly after 'load' on a slow connection.
-  var tries = 0;
-  (function wait(){
-    tries++;
-    if (document.querySelector('.reveal') || tries > 100) setup();
-    else setTimeout(wait, 100);
-  })();
-})();
 </script>
 </body>
 </html>
