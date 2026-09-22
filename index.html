@@ -26,8 +26,9 @@ a:hover { color: #6a6aa3; }
 @media (max-width:560px) { .portfolio-grid { grid-template-columns:1fr; } }
 
 @media (max-width:640px) {
-  section, footer, .site-header { padding-left:20px !important; padding-right:20px !important; }
+  section, footer, .site-header, .promo-bar { padding-left:20px !important; padding-right:20px !important; }
   h1 { font-size:34px !important; }
+  footer { padding-bottom:170px !important; }
 }
 </style>
 </helmet>
@@ -66,6 +67,48 @@ a:hover { color: #6a6aa3; }
       </div>
     </div>
   </section>
+
+  <div class="promo-bar" style="position:fixed; left:0; right:0; bottom:0; z-index:100; padding:12px 40px; background:rgba(255,255,255,0.92); backdrop-filter:blur(10px); box-shadow:0 -4px 4px rgba(0,0,0,0.06); border-top:3px solid transparent; border-image:linear-gradient(90deg,#FF2D44 0%,#434373 100%) 1">
+    <div style="max-width:1286px; margin:0 auto; display:flex; flex-wrap:wrap; gap:16px 24px; align-items:center; justify-content:space-between">
+      <div style="display:flex; align-items:center; gap:14px; min-width:260px">
+        <div style="flex:none; width:44px; height:44px; border-radius:15px; background:rgba(255,45,68,0.1); display:flex; align-items:center; justify-content:center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF2D44" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="8" width="18" height="4" rx="1"></rect>
+            <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"></path>
+            <path d="M12 8H7.5a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8z"></path>
+            <path d="M12 8h4.5a2.5 2.5 0 0 0 0-5C13 3 12 8 12 8z"></path>
+          </svg>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px">
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+            <div style="font-size:16px; font-weight:500; letter-spacing:-0.01em">Этот курс в подарок при покупке любого другого</div>
+          </div>
+          <div style="font-size:12px; color:#6b6b6b">Только до конца недели, время московское</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+        <div style="display:flex; gap:8px">
+          <div style="background:#eef1f5; border-radius:10px; padding:8px 14px; text-align:center; min-width:62px">
+            <div style="font-size:22px; font-weight:500; line-height:1.1; letter-spacing:-0.01em">{{ cdDays }}</div>
+            <div style="font-size:11px; color:#6b6b6b; margin-top:2px">{{ cdDaysLabel }}</div>
+          </div>
+          <div style="background:#eef1f5; border-radius:10px; padding:8px 14px; text-align:center; min-width:62px">
+            <div style="font-size:22px; font-weight:500; line-height:1.1; letter-spacing:-0.01em">{{ cdHours }}</div>
+            <div style="font-size:11px; color:#6b6b6b; margin-top:2px">{{ cdHoursLabel }}</div>
+          </div>
+          <div style="background:#eef1f5; border-radius:10px; padding:8px 14px; text-align:center; min-width:62px">
+            <div style="font-size:22px; font-weight:500; line-height:1.1; letter-spacing:-0.01em">{{ cdMinutes }}</div>
+            <div style="font-size:11px; color:#6b6b6b; margin-top:2px">{{ cdMinutesLabel }}</div>
+          </div>
+          <div style="background:#eef1f5; border-radius:10px; padding:8px 14px; text-align:center; min-width:62px">
+            <div style="font-size:22px; font-weight:500; line-height:1.1; letter-spacing:-0.01em">{{ cdSeconds }}</div>
+            <div style="font-size:11px; color:#6b6b6b; margin-top:2px">{{ cdSecondsLabel }}</div>
+          </div>
+        </div>
+        <x-import component-from-global-scope="Ds2030DesignSystem_c2b493.Button" variant="danger" on-click="{{ openContacts }}" hint-size="170px,44px">Забрать подарок</x-import>
+      </div>
+    </div>
+  </div>
 
   <section style="padding:80px 40px 0">
     <div style="max-width:1286px; margin:0 auto">
@@ -334,7 +377,7 @@ a:hover { color: #6a6aa3; }
         </div>
       </div>
     </div>
-  </sc-if><footer style="background:#2b2b61; color:rgba(255,255,255,0.8); padding:48px 40px">
+  </sc-if><footer style="background:#2b2b61; color:rgba(255,255,255,0.8); padding:48px 40px 140px">
     <div style="max-width:1286px; margin:0 auto; display:flex; flex-wrap:wrap; gap:24px; justify-content:space-between; align-items:center">
       <div>
         <div style="font-size:18px; font-weight:700; color:#fff; margin-bottom:6px">Школа Риты Стой</div>
@@ -352,10 +395,46 @@ a:hover { color: #6a6aa3; }
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showPortfolio&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Контент&quot;},&quot;showCta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Контент&quot;},&quot;telegramUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://t.me/rita_stoi_school&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;vkUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://vk.com/full_illustrator&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;},&quot;maxUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://max.ru/u/f9LHodD0cOLl1NgY-ZTwt9rEVBPDajgrJWrQAjN8LKsz0EHinfpfcSERqpM&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Контакты&quot;}}">
 class Component extends DCLogic {
-  state = { contactsOpen: false };
+  state = { contactsOpen: false, now: Date.now() };
+
+  componentDidMount() {
+    this._t = setInterval(() => this.setState({ now: Date.now() }), 1000);
+  }
+  componentWillUnmount() { clearInterval(this._t); }
+
+  // Конец текущей недели: воскресенье 23:59 по Москве (UTC+3)
+  weekEnd() {
+    const MSK = 3 * 3600e3;
+    const m = new Date(Date.now() + MSK);
+    const dow = m.getUTCDay();
+    const daysLeft = (7 - (dow === 0 ? 7 : dow));
+    const end = Date.UTC(m.getUTCFullYear(), m.getUTCMonth(), m.getUTCDate() + daysLeft, 23, 59, 59);
+    return end - MSK;
+  }
+
+  plural(n, forms) {
+    const n10 = n % 10, n100 = n % 100;
+    if (n10 === 1 && n100 !== 11) return forms[0];
+    if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return forms[1];
+    return forms[2];
+  }
+
   renderVals() {
+    const left = Math.max(0, this.weekEnd() - this.state.now);
+    const days = Math.floor(left / 86400e3);
+    const hours = Math.floor(left / 3600e3) % 24;
+    const minutes = Math.floor(left / 60e3) % 60;
+    const seconds = Math.floor(left / 1000) % 60;
     return {
       contactsOpen: this.state.contactsOpen,
+      cdDays: days,
+      cdHours: hours,
+      cdMinutes: minutes,
+      cdDaysLabel: this.plural(days, ['день', 'дня', 'дней']),
+      cdHoursLabel: this.plural(hours, ['час', 'часа', 'часов']),
+      cdMinutesLabel: this.plural(minutes, ['минута', 'минуты', 'минут']),
+      cdSeconds: seconds,
+      cdSecondsLabel: this.plural(seconds, ['секунда', 'секунды', 'секунд']),
       openContacts: () => this.setState({ contactsOpen: true }),
       scrollToProgram: () => {
         const el = document.getElementById('program');
