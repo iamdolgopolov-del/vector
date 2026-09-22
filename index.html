@@ -78,39 +78,32 @@ a:hover { color: #6a6aa3; }
      middle link row; brand + CTA still fit and stay tappable. */
   .site-header nav { display:none !important; }
   .site-header button { padding:0 14px !important; font-size:13px !important; }
-  /* animation-timeline: view() (used for .reveal below) still has rough
-     edges on mobile Safari when combined with aspect-ratio grids — it was
-     observed blowing up a portfolio image to full-viewport size. Disable
-     the scroll-reveal effect below this breakpoint entirely; content just
-     shows immediately, which is strictly safer than a broken layout. */
-  .reveal { opacity:1 !important; transform:none !important; animation:none !important; }
 }
 
-/* Scroll-reveal is pure CSS (scroll-driven animation), on purpose: this
-   page re-renders every second (countdown timer), and any JS-added class
-   (e.g. an IntersectionObserver toggling .is-visible) gets wiped by that
-   re-render the moment it fires, permanently stranding revealed blocks at
-   opacity:0. animation-timeline reads scroll position directly with no
-   DOM/JS state to lose, so it survives re-renders. Unsupported browsers
-   fall through the @supports guard and just see the content, fully visible
-   — never hidden. */
-.reveal { opacity:1; }
-@supports (animation-timeline: view()) {
-  .reveal {
-    opacity:0;
-    transform:translateY(26px);
-    animation: reveal-in linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 45%;
-  }
-  @keyframes reveal-in { to { opacity:1; transform:none; } }
-}
+/* Scroll-reveal: plain CSS transition triggered by a JS-added class.
+   (An earlier animation-timeline: view() version was CSS-only and immune
+   to re-renders, but mobile Safari mis-renders it in combination with
+   aspect-ratio grids — it blew a portfolio image up to full-viewport
+   size. Back to IntersectionObserver, hardened against the failure mode
+   that broke the first JS version: a MutationObserver below keeps
+   re-attaching the IntersectionObserver to any .reveal node that gets
+   replaced, so a node swapped out by the 1s countdown re-render still
+   gets re-revealed within a frame instead of staying stuck invisible.) */
+.reveal { opacity:0; transform:translateY(26px); transition:opacity .6s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1); }
+.reveal.is-visible { opacity:1; transform:none; }
+.reveal-grid > .reveal:nth-child(2){transition-delay:.07s}
+.reveal-grid > .reveal:nth-child(3){transition-delay:.14s}
+.reveal-grid > .reveal:nth-child(4){transition-delay:.21s}
+.reveal-grid > .reveal:nth-child(5){transition-delay:.28s}
+.reveal-grid > .reveal:nth-child(6){transition-delay:.35s}
+.reveal-grid > .reveal:nth-child(7){transition-delay:.42s}
+.reveal-grid > .reveal:nth-child(8){transition-delay:.49s}
 
 image-slot{transition:transform .5s cubic-bezier(.22,.61,.36,1)}
 figure:hover image-slot, .authors-grid image-slot:hover { transform:scale(1.04); }
 
 @media (prefers-reduced-motion: reduce){
-  .reveal{ opacity:1 !important; transform:none !important; animation:none !important; }
+  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
   image-slot{ transition:none !important; }
 }
 </style>
@@ -543,6 +536,52 @@ class Component extends DCLogic {
     };
   }
 }
+</script>
+<script>
+(function(){
+  var io = null;
+  function reveal(el){ el.classList.add('is-visible'); }
+  function observe(el){
+    if (el.__revealObserved) return;
+    el.__revealObserved = true;
+    io.observe(el);
+  }
+  function scan(root){
+    if (root.querySelectorAll) root.querySelectorAll('.reveal').forEach(observe);
+  }
+  function setup(){
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll('.reveal').forEach(reveal);
+      return;
+    }
+    io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) reveal(entry.target);
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+    scan(document);
+    // The countdown timer re-renders the page every second. If that ever
+    // swaps out a .reveal node that was already showing, the fresh node
+    // starts hidden again with nothing watching it — this MutationObserver
+    // notices the new node and (re-)observes it immediately, so it's back
+    // to visible within a frame instead of staying stuck invisible.
+    new MutationObserver(function(mutations){
+      mutations.forEach(function(m){
+        m.addedNodes.forEach(function(node){
+          if (node.nodeType !== 1) return;
+          if (node.matches && node.matches('.reveal')) observe(node);
+          scan(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  var tries = 0;
+  (function wait(){
+    tries++;
+    if (document.querySelector('.reveal') || tries > 100) setup();
+    else setTimeout(wait, 100);
+  })();
+})();
 </script>
 </body>
 </html>
